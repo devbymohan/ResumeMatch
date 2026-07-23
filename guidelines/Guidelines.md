@@ -1,4 +1,4 @@
-**Add your own guidelines here**
+**Create account and get your resume score**
 <!--
 
 System Guidelines
