@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router";
 import { AnimatePresence } from "motion/react";
 import { Toaster } from "sonner";
 
@@ -22,13 +22,16 @@ function AppInner() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/auth" element={<AuthPage />} />
         <Route path="/login" element={<AuthPage mode="login" />} />
         <Route path="/register" element={<AuthPage mode="register" />} />
         <Route path="/dashboard" element={<ProtectedRoute><AppShell><DashboardPage /></AppShell></ProtectedRoute>} />
         <Route path="/analyzer" element={<ProtectedRoute><AppShell><AnalyzerPage /></AppShell></ProtectedRoute>} />
         <Route path="/results/:id" element={<ProtectedRoute><AppShell><ResultsPage /></AppShell></ProtectedRoute>} />
+        <Route path="/report/:id" element={<ProtectedRoute><AppShell><ResultsPage /></AppShell></ProtectedRoute>} />
         <Route path="/history" element={<ProtectedRoute><AppShell><HistoryPage /></AppShell></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><AppShell><ProfilePage /></AppShell></ProtectedRoute>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AnimatePresence>
   );

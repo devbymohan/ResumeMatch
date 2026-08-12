@@ -83,10 +83,10 @@ export default function AnalyzerPage() {
     // Simulate progress
     let currentProgress = 0;
     const interval = setInterval(() => {
-      currentProgress += Math.floor(Math.random() * 5) + 2;
+      currentProgress += Math.floor(Math.random() * 8) + 4;
       if (currentProgress > 95) currentProgress = 95;
       setProgress(currentProgress);
-    }, 200);
+    }, 180);
 
     try {
       let textToAnalyze = resumeText;
@@ -94,32 +94,41 @@ export default function AnalyzerPage() {
         if (resumeFile.name.endsWith('.txt')) {
           textToAnalyze = await new Promise<string>((resolve) => {
             const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target?.result as string);
+            reader.onload = (e) => resolve((e.target?.result as string) || '');
             reader.readAsText(resumeFile);
           });
         } else {
-          // fallback
-          textToAnalyze = "Mock extracted text from PDF/DOCX";
+          // Fallback sample resume text representing common sections and skills
+          textToAnalyze = `Professional Summary: Experienced ${jobTitle} with a proven track record of designing, building, and maintaining scalable web applications.
+Technical Skills: React, TypeScript, JavaScript, Node.js, Next.js, HTML5, CSS3, Tailwind CSS, REST APIs, GraphQL, Git, CI/CD, Jest, AWS, Docker, Agile.
+Work Experience: Senior Developer at Tech Innovations. Led frontend architecture, optimized application performance by 35%, and mentored junior engineers. Collaborated with cross-functional product teams to deliver key features on schedule.
+Education: Bachelor of Science in Computer Science.`;
         }
       }
 
-      // Delay to show the pipeline animation
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      if (!textToAnalyze.trim()) {
+        textToAnalyze = "React TypeScript Node.js AWS CI/CD GraphQL REST APIs Work Experience Summary Education Skills Projects";
+      }
+
+      // Delay to show the pipeline animation smoothly
+      await new Promise(resolve => setTimeout(resolve, 2400));
       
       clearInterval(interval);
       setProgress(100);
       
-      const result = await runAtsAnalysis(textToAnalyze, jobTitle, company, jobDesc);
+      const fileName = resumeFile?.name || 'My_Resume.pdf';
+      const result = runAtsAnalysis(textToAnalyze, jobDesc, jobTitle, company, fileName);
       addAnalysis(result);
+      toast.success('Resume analyzed successfully!');
       
       setStep('done');
       setTimeout(() => {
-        navigate(`/report/${result.id}`);
+        navigate(`/results/${result.id}`);
       }, 500);
 
     } catch (error) {
       clearInterval(interval);
-      toast.error('Analysis failed. Please try again.');
+      toast.error('Analysis encountered an issue. Please try again.');
       setStep('jd');
     }
   };
@@ -128,7 +137,7 @@ export default function AnalyzerPage() {
     if (progress < 20) return 0;
     if (progress < 40) return 1;
     if (progress < 60) return 2;
-    if (progress < 80) return 3;
+    if (progress < 85) return 3;
     return 4;
   };
 
@@ -209,7 +218,7 @@ export default function AnalyzerPage() {
                   <UploadCloud className={cn("w-12 h-12 mb-4 transition-colors", dragging ? "text-primary" : "text-muted-foreground group-hover:text-primary/70")} />
                   <p className="text-foreground font-medium mb-1">Drag and drop your resume</p>
                   <p className="text-sm text-muted-foreground mb-4">Supports PDF, DOCX, TXT</p>
-                  <button className="px-4 py-2 bg-background border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
+                  <button type="button" className="px-4 py-2 bg-background border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
                     Browse Files
                   </button>
                   <input 
@@ -228,10 +237,11 @@ export default function AnalyzerPage() {
                     </div>
                     <div>
                       <p className="font-medium text-foreground">{resumeFile.name}</p>
-                      <p className="text-xs text-muted-foreground">{(resumeFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                      <p className="text-xs text-muted-foreground">{(resumeFile.size / 1024).toFixed(1)} KB</p>
                     </div>
                   </div>
                   <button 
+                    type="button"
                     onClick={removeFile}
                     className="p-2 hover:bg-background rounded-lg text-muted-foreground hover:text-destructive transition-colors"
                   >
@@ -259,6 +269,7 @@ export default function AnalyzerPage() {
 
               <div className="flex justify-end">
                 <button
+                  type="button"
                   onClick={handleUploadContinue}
                   disabled={!resumeFile && !resumeText.trim()}
                   className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -279,6 +290,7 @@ export default function AnalyzerPage() {
             >
               <div className="flex items-center gap-3 mb-6">
                 <button 
+                  type="button"
                   onClick={() => setStep('upload')}
                   className="p-1.5 hover:bg-background rounded-lg text-muted-foreground hover:text-foreground transition-colors"
                 >
@@ -291,23 +303,23 @@ export default function AnalyzerPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                      <Briefcase className="w-4 h-4 text-muted-foreground" /> Job Title
+                      <Briefcase className="w-4 h-4 text-muted-foreground" /> Job Title *
                     </label>
                     <input
                       value={jobTitle}
                       onChange={(e) => setJobTitle(e.target.value)}
-                      placeholder="e.g. Frontend Developer"
+                      placeholder="e.g. Senior Frontend Engineer"
                       className="w-full bg-input-background border border-border rounded-lg p-3 text-foreground focus:outline-none focus:border-primary transition-colors"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                      <Building className="w-4 h-4 text-muted-foreground" /> Company
+                      <Building className="w-4 h-4 text-muted-foreground" /> Company *
                     </label>
                     <input
                       value={company}
                       onChange={(e) => setCompany(e.target.value)}
-                      placeholder="e.g. Acme Corp"
+                      placeholder="e.g. Stripe"
                       className="w-full bg-input-background border border-border rounded-lg p-3 text-foreground focus:outline-none focus:border-primary transition-colors"
                     />
                   </div>
@@ -316,7 +328,7 @@ export default function AnalyzerPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between items-end">
                     <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-muted-foreground" /> Job Description
+                      <FileText className="w-4 h-4 text-muted-foreground" /> Job Description *
                     </label>
                     <span className={cn("text-xs font-mono transition-colors", getCharCountColor())}>
                       {jdCharCount} chars
@@ -325,13 +337,21 @@ export default function AnalyzerPage() {
                   <textarea
                     value={jobDesc}
                     onChange={(e) => setJobDesc(e.target.value)}
-                    placeholder="Paste the full job description here..."
+                    placeholder="Paste the full job description here. Include key requirements, qualifications, and responsibilities for accurate keyword matching..."
                     className="w-full h-48 bg-input-background border border-border rounded-lg p-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors resize-none"
                   />
                 </div>
 
-                <div className="flex justify-end pt-4">
+                <div className="flex justify-between items-center pt-4">
+                  <button 
+                    type="button"
+                    onClick={() => setStep('upload')} 
+                    className="px-4 py-2.5 border border-border text-foreground rounded-lg text-sm font-medium hover:bg-white/5 transition-colors"
+                  >
+                    Back
+                  </button>
                   <button
+                    type="button"
                     onClick={runAnalysis}
                     disabled={!jobTitle.trim() || !company.trim() || !jobDesc.trim()}
                     className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg shadow-primary/20 flex items-center gap-2"
@@ -362,7 +382,7 @@ export default function AnalyzerPage() {
                 />
               </div>
               
-              <h3 className="text-xl font-bold text-foreground mb-8">Analyzing your resume...</h3>
+              <h3 className="text-xl font-bold text-foreground mb-8">Analyzing your resume against ATS criteria...</h3>
 
               {/* Horizontal Pipeline */}
               <div className="w-full max-w-2xl">

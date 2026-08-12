@@ -3,13 +3,12 @@ import { motion } from 'motion/react';
 import { useNavigate } from 'react-router';
 import { 
   Target, Award, FileText, Briefcase, Zap, 
-  TrendingUp, TrendingDown, ArrowRight, Lightbulb
+  TrendingUp, TrendingDown, ArrowRight, Lightbulb, ChevronRight
 } from 'lucide-react';
 import { 
   AreaChart, Area, RadarChart, Radar, ResponsiveContainer, 
   CartesianGrid, XAxis, YAxis, Tooltip, PolarGrid, PolarAngleAxis, PolarRadiusAxis 
 } from 'recharts';
-import { toast } from 'sonner';
 import { cn } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useAnalyses } from '../context/AnalysesContext';
@@ -28,11 +27,11 @@ export default function DashboardPage() {
   }, []);
 
   const stats = useMemo(() => {
-    if (analyses.length === 0) {
+    if (!analyses || analyses.length === 0) {
       return { avgScore: 0, bestScore: 0, total: 0, strongMatches: 0 };
     }
     
-    const scores = analyses.map(a => a.overallScore);
+    const scores = analyses.map(a => a.atsScore || 0);
     const sum = scores.reduce((a, b) => a + b, 0);
     const avg = Math.round(sum / scores.length);
     const best = Math.max(...scores);
@@ -41,17 +40,16 @@ export default function DashboardPage() {
     return { avgScore: avg, bestScore: best, total: analyses.length, strongMatches: strong };
   }, [analyses]);
 
-  const latestAnalysis = analyses[0];
+  const latestAnalysis = analyses && analyses.length > 0 ? analyses[0] : null;
   
   const radarData = useMemo(() => {
     if (!latestAnalysis) return [];
-    const b = latestAnalysis.breakdown;
     return [
-      { subject: 'Format', A: b.formatting, fullMark: 100 },
-      { subject: 'Impact', A: b.impact, fullMark: 100 },
-      { subject: 'Skills', A: b.keywordMatch, fullMark: 100 },
-      { subject: 'Readability', A: b.readability, fullMark: 100 },
-      { subject: 'Length', A: 85, fullMark: 100 }
+      { subject: 'Keywords', A: latestAnalysis.keywordScore || 0, fullMark: 100 },
+      { subject: 'Structure', A: latestAnalysis.structureScore || 0, fullMark: 100 },
+      { subject: 'Complete', A: latestAnalysis.completenessScore || 0, fullMark: 100 },
+      { subject: 'Readable', A: latestAnalysis.readabilityScore || 0, fullMark: 100 },
+      { subject: 'Skills', A: 85, fullMark: 100 }
     ];
   }, [latestAnalysis]);
 
@@ -78,7 +76,7 @@ export default function DashboardPage() {
         className="space-y-1"
       >
         <h1 className="text-3xl font-bold text-foreground">
-          {greeting}, {user?.name?.split(' ')[0] || 'Guest'}
+          {greeting}, {user?.name?.split(' ')[0] || 'there'}
         </h1>
         <p className="text-muted-foreground">
           Here's your resume performance overview.
@@ -121,7 +119,7 @@ export default function DashboardPage() {
             icon: Briefcase, 
             color: 'text-purple-500', 
             borderColor: 'border-purple-500',
-            trend: '2 new matches',
+            trend: `${stats.strongMatches} strong matches`,
             trendColor: 'text-primary'
           }
         ].map((stat, i) => (
@@ -179,8 +177,8 @@ export default function DashboardPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                <XAxis dataKey="date" stroke="#666D66" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#666D66" fontSize={12} tickLine={false} axisLine={false} />
+                <XAxis dataKey="month" stroke="#666D66" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis domain={[40, 100]} stroke="#666D66" fontSize={12} tickLine={false} axisLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Area 
                   type="monotone" 
@@ -256,21 +254,21 @@ export default function DashboardPage() {
           </div>
           
           <div className="flex-1">
-            {analyses.length > 0 ? (
+            {analyses && analyses.length > 0 ? (
               <div className="divide-y divide-border">
                 {analyses.slice(0, 3).map((analysis) => (
                   <div 
                     key={analysis.id}
-                    onClick={() => navigate(`/report/${analysis.id}`)}
+                    onClick={() => navigate(`/results/${analysis.id}`)}
                     className="p-4 flex items-center justify-between hover:bg-background/50 cursor-pointer transition-colors group"
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center bg-background group-hover:border-primary/30 transition-colors">
-                        <span className="font-mono font-bold text-foreground">{analysis.overallScore}</span>
+                        <span className="font-mono font-bold text-foreground">{analysis.atsScore}</span>
                       </div>
                       <div>
                         <h4 className="font-medium text-foreground">{analysis.jobTitle}</h4>
-                        <p className="text-xs text-muted-foreground">{analysis.company} • {new Date(analysis.date).toLocaleDateString()}</p>
+                        <p className="text-xs text-muted-foreground">{analysis.company} • {new Date(analysis.createdAt).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
