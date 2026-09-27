@@ -57,8 +57,8 @@ export default function DashboardPage() {
     if (active && payload && payload.length) {
       return (
         <div className="bg-card border border-border p-3 rounded-lg shadow-xl">
-          <p className="text-foreground font-medium mb-1">{label}</p>
-          <p className="text-primary font-mono text-lg font-bold">
+          <p className="text-foreground font-medium mb-1 text-xs">{label}</p>
+          <p className="text-primary font-mono text-base font-bold">
             {payload[0].value}%
           </p>
         </div>
@@ -68,23 +68,23 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8 pb-20">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8 pb-20">
       {/* Greeting Banner */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="space-y-1"
       >
-        <h1 className="text-3xl font-bold text-foreground">
+        <h1 className="text-2xl sm:text-3xl font-black text-foreground">
           {greeting}, {user?.name?.split(' ')[0] || 'there'}
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           Here's your resume performance overview.
         </p>
       </motion.div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Stat Cards (2x2 grid on mobile for compact viewing) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {[
           { 
             label: 'Avg ATS Score', 
@@ -92,7 +92,7 @@ export default function DashboardPage() {
             icon: Target, 
             color: 'text-primary', 
             borderColor: 'border-primary',
-            trend: '↑ 12% from last month',
+            trend: '↑ 12%',
             trendColor: 'text-primary'
           },
           { 
@@ -101,7 +101,7 @@ export default function DashboardPage() {
             icon: Award, 
             color: 'text-accent', 
             borderColor: 'border-accent',
-            trend: '↑ 5% from last month',
+            trend: '↑ 5%',
             trendColor: 'text-primary'
           },
           { 
@@ -110,7 +110,7 @@ export default function DashboardPage() {
             icon: FileText, 
             color: 'text-blue-500', 
             borderColor: 'border-blue-500',
-            trend: '+3 this week',
+            trend: '+3 total',
             trendColor: 'text-muted-foreground'
           },
           { 
@@ -119,7 +119,7 @@ export default function DashboardPage() {
             icon: Briefcase, 
             color: 'text-purple-500', 
             borderColor: 'border-purple-500',
-            trend: `${stats.strongMatches} strong matches`,
+            trend: `${stats.strongMatches} strong`,
             trendColor: 'text-primary'
           }
         ].map((stat, i) => (
@@ -127,29 +127,29 @@ export default function DashboardPage() {
             key={i}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
+            transition={{ delay: i * 0.08 }}
             className={cn(
-              "bg-card/80 backdrop-blur-sm border border-border rounded-xl p-5",
-              "border-l-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
+              "bg-card/80 backdrop-blur-sm border border-border rounded-xl p-3.5 sm:p-5",
+              "border-l-4 transition-all duration-300 hover:shadow-lg",
               stat.borderColor
             )}
           >
             <div className="flex justify-between items-start">
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                <p className="text-3xl font-bold font-mono text-foreground">{stat.value}</p>
+              <div className="space-y-1 sm:space-y-2">
+                <p className="text-xs font-medium text-muted-foreground truncate">{stat.label}</p>
+                <p className="text-xl sm:text-3xl font-bold font-mono text-foreground">{stat.value}</p>
               </div>
-              <div className={cn("p-2 rounded-lg bg-background", stat.color)}>
-                <stat.icon className="w-5 h-5" />
+              <div className={cn("p-1.5 sm:p-2 rounded-lg bg-background flex-shrink-0", stat.color)}>
+                <stat.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
             </div>
-            <div className="mt-4 flex items-center gap-1.5">
+            <div className="mt-3 sm:mt-4 flex items-center gap-1">
               {stat.trend.includes('↑') || stat.trend.includes('+') ? (
-                <TrendingUp className={cn("w-3.5 h-3.5", stat.trendColor)} />
+                <TrendingUp className={cn("w-3 h-3 sm:w-3.5 sm:h-3.5", stat.trendColor)} />
               ) : stat.trend.includes('↓') || stat.trend.includes('-') ? (
-                <TrendingDown className={cn("w-3.5 h-3.5", stat.trendColor)} />
+                <TrendingDown className={cn("w-3 h-3 sm:w-3.5 sm:h-3.5", stat.trendColor)} />
               ) : null}
-              <span className={cn("text-xs font-medium", stat.trendColor)}>{stat.trend}</span>
+              <span className={cn("text-[11px] sm:text-xs font-medium truncate", stat.trendColor)}>{stat.trend}</span>
             </div>
           </motion.div>
         ))}
@@ -160,16 +160,16 @@ export default function DashboardPage() {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
-          className="lg:col-span-2 bg-card border border-border rounded-xl p-6"
+          transition={{ delay: 0.3 }}
+          className="lg:col-span-2 bg-card border border-border rounded-xl p-4 sm:p-6"
         >
-          <div className="mb-6">
-            <h3 className="text-lg font-bold text-foreground">Score Trend</h3>
-            <p className="text-sm text-muted-foreground">Your average ATS score over time</p>
+          <div className="mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-bold text-foreground">Score Trend</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground">Your average ATS score over time</p>
           </div>
-          <div className="h-64">
+          <div className="h-48 sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={DASHBOARD_TREND} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={DASHBOARD_TREND} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#059669" stopOpacity={0.3}/>
@@ -177,8 +177,8 @@ export default function DashboardPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                <XAxis dataKey="month" stroke="#666D66" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis domain={[40, 100]} stroke="#666D66" fontSize={12} tickLine={false} axisLine={false} />
+                <XAxis dataKey="month" stroke="#666D66" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis domain={[40, 100]} stroke="#666D66" fontSize={11} tickLine={false} axisLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Area 
                   type="monotone" 
@@ -196,19 +196,19 @@ export default function DashboardPage() {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
-          className="bg-card border border-border rounded-xl p-6 flex flex-col"
+          transition={{ delay: 0.4 }}
+          className="bg-card border border-border rounded-xl p-4 sm:p-6 flex flex-col"
         >
           <div className="mb-2">
-            <h3 className="text-lg font-bold text-foreground">Latest Breakdown</h3>
-            <p className="text-sm text-muted-foreground">Performance by category</p>
+            <h3 className="text-base sm:text-lg font-bold text-foreground">Latest Breakdown</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground">Performance by category</p>
           </div>
-          <div className="flex-1 min-h-[240px]">
+          <div className="flex-1 min-h-[220px]">
             {radarData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                <RadarChart cx="50%" cy="50%" outerRadius="65%" data={radarData}>
                   <PolarGrid stroke="rgba(255,255,255,0.1)" />
-                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#666D66', fontSize: 12 }} />
+                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#666D66', fontSize: 11 }} />
                   <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                   <Radar
                     name="Score"
@@ -218,13 +218,13 @@ export default function DashboardPage() {
                     fillOpacity={0.3}
                   />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#121515', borderColor: 'rgba(255,255,255,0.07)', borderRadius: '8px' }}
+                    contentStyle={{ backgroundColor: '#121515', borderColor: 'rgba(255,255,255,0.07)', borderRadius: '8px', fontSize: '12px' }}
                     itemStyle={{ color: '#F97316' }}
                   />
                 </RadarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm h-full">
+              <div className="flex-1 flex items-center justify-center text-muted-foreground text-xs sm:text-sm h-full">
                 No data available
               </div>
             )}
@@ -237,19 +237,19 @@ export default function DashboardPage() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.5 }}
           className="lg:col-span-2 bg-card border border-border rounded-xl overflow-hidden flex flex-col"
         >
-          <div className="p-6 border-b border-border flex justify-between items-center">
+          <div className="p-4 sm:p-6 border-b border-border flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-bold text-foreground">Recent Analyses</h3>
-              <p className="text-sm text-muted-foreground">Your last 3 scanned resumes</p>
+              <h3 className="text-base sm:text-lg font-bold text-foreground">Recent Analyses</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">Your recent scanned resumes</p>
             </div>
             <button 
               onClick={() => navigate('/history')}
-              className="text-sm font-medium text-primary hover:text-primary/80 flex items-center gap-1"
+              className="text-xs sm:text-sm font-medium text-primary hover:text-primary/80 flex items-center gap-1"
             >
-              View all <ArrowRight className="w-4 h-4" />
+              View all <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
           
@@ -260,23 +260,23 @@ export default function DashboardPage() {
                   <div 
                     key={analysis.id}
                     onClick={() => navigate(`/results/${analysis.id}`)}
-                    className="p-4 flex items-center justify-between hover:bg-background/50 cursor-pointer transition-colors group"
+                    className="p-3.5 sm:p-4 flex items-center justify-between hover:bg-background/50 cursor-pointer transition-colors group"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center bg-background group-hover:border-primary/30 transition-colors">
-                        <span className="font-mono font-bold text-foreground">{analysis.atsScore}</span>
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1 pr-2">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-border flex items-center justify-center bg-background group-hover:border-primary/30 transition-colors flex-shrink-0">
+                        <span className="font-mono text-sm sm:text-base font-bold text-foreground">{analysis.atsScore}</span>
                       </div>
-                      <div>
-                        <h4 className="font-medium text-foreground">{analysis.jobTitle}</h4>
-                        <p className="text-xs text-muted-foreground">{analysis.company} • {new Date(analysis.createdAt).toLocaleDateString()}</p>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-bold text-xs sm:text-sm text-foreground truncate">{analysis.jobTitle}</h4>
+                        <p className="text-[11px] sm:text-xs text-muted-foreground truncate">{analysis.company} • {new Date(analysis.createdAt).toLocaleDateString()}</p>
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center text-muted-foreground">
+              <div className="p-8 text-center text-xs sm:text-sm text-muted-foreground">
                 No analyses yet. Start by analyzing a resume!
               </div>
             )}
@@ -286,26 +286,26 @@ export default function DashboardPage() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="bg-card border border-border rounded-xl p-6 relative overflow-hidden group flex flex-col justify-between"
+          transition={{ delay: 0.6 }}
+          className="bg-card border border-border rounded-xl p-5 sm:p-6 relative overflow-hidden group flex flex-col justify-between"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           
           <div>
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6 border border-primary/20">
-              <Zap className="w-6 h-6 text-primary" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 sm:mb-6 border border-primary/20">
+              <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">Ready for your next application?</h3>
-            <p className="text-sm text-muted-foreground mb-6">
+            <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2">Ready for your next application?</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
               Tailor your resume for that specific job description to maximize your chances.
             </p>
 
             {latestAnalysis?.suggestions && latestAnalysis.suggestions.length > 0 && (
-              <div className="mb-6 p-4 rounded-lg bg-background border border-border flex items-start gap-3">
-                <Lightbulb className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+              <div className="mb-4 sm:mb-6 p-3.5 rounded-lg bg-background border border-border flex items-start gap-2.5">
+                <Lightbulb className="w-4 h-4 text-accent shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-xs font-bold text-foreground uppercase tracking-wider mb-1">Recent Tip</h4>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
+                  <h4 className="text-[10px] font-bold text-foreground uppercase tracking-wider mb-0.5">Recent Tip</h4>
+                  <p className="text-xs text-muted-foreground line-clamp-2">
                     {latestAnalysis.suggestions[0]}
                   </p>
                 </div>
@@ -315,7 +315,7 @@ export default function DashboardPage() {
 
           <button 
             onClick={() => navigate('/analyzer')}
-            className="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg flex items-center justify-center gap-2 transition-colors relative z-10"
+            className="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors relative z-10 shadow-lg shadow-primary/20"
           >
             <Zap className="w-4 h-4" />
             New Analysis
